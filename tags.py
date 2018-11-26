@@ -1,5 +1,13 @@
 import boto3
+import logging
 from variables import RoleArn
+from time import strftime
+logger = logging.getLogger('myapp')
+hdlr = logging.FileHandler(strftime("/var/tmp/tagEBSVolume_%H_%M_%m_%d_%Y.log"))
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+logger.addHandler(hdlr)
+logger.setLevel(logging.DEBUG)
 
 sts_client = boto3.client('sts')
 
@@ -36,21 +44,31 @@ def copythetags(instance):
             tagdictionary['Key'] = itag['Key']
             temptags.append(tagdictionary.copy())
             print("[INFO] Copying Tag...")
+            logger.info('Copying Tag...')
             print("[INFO] Key: " + itag['Key'] + " Value: " + itag['Value'])
+            logger.info("Key: " + itag['Key'] + " Value: " + itag['Value'])
         else:
             print("[INFO]: Skipping Tag: - Key: " + itag['Key'])
+            logger.info("Skipping Tag: - Key: " + itag['Key'])
     return temptags
 
 
 instances = ec2.instances.all()
+count = 0
 for instance in instances:
     if instance.tags is not None:
         for volume in instance.volumes.all():
             if dryRun:
                 print("[INFO] " + str(volume) + " [INSTANCE] " + str(instance))
+                logger.info(str(volume) + " [INSTANCE] " + str(instance))
                 copythetags(instance)
             else:
-                print("[INFO] " + str(volume) + " [INSTANCE] " + str(instance))
+                print("[INFO] Tagging " + str(volume) + " attached to  " + str(instance))
+                logger.info("Tagging " + str(volume) + " attached to  " + str(instance))
                 tag = volume.create_tags(Tags=copythetags(instance))
+                count += 1
+                print("[INFO] " + str(count) + " volumes tagged.")
+                logger.info(str(count) + " volumes tagged.")
     else:
-        print("[INFO] Skipping Instance " + str(instance) + " ... no tags.")
+        print("[INFO] Skipping volumes attached to instance " + str(instance) + " ... no tags.")
+        logger.info("Skipping volumes attached to instance " + str(instance) + " ... no tags.")

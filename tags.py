@@ -30,7 +30,6 @@ def copythetags(instance):
         "Environment")
     temptags = []
     tagdictionary = {}
-
     for itag in instance.tags:
         if itag['Key'] in viptags:
             tagdictionary['Value'] = itag['Value']
@@ -40,16 +39,18 @@ def copythetags(instance):
             print("[INFO] Key: " + itag['Key'] + " Value: " + itag['Value'])
         else:
             print("[INFO]: Skipping Tag: - Key: " + itag['Key'])
-
     return temptags
 
 
 instances = ec2.instances.all()
 for instance in instances:
-    for volume in instance.volumes.all():
-        if dryRun:
-            print("[VOLUME] " + str(volume) + " [INSTANCE] " + str(instance))
-            copythetags(instance)
-        else:
-            print("[VOLUME]  " + str(volume) + " [INSTANCE] " + str(instance))
-            tag = volume.create_tags(Tags=copythetags(instance))
+    if instance.tags is not None:
+        for volume in instance.volumes.all():
+            if dryRun:
+                print("[INFO] " + str(volume) + " [INSTANCE] " + str(instance))
+                copythetags(instance)
+            else:
+                print("[INFO] " + str(volume) + " [INSTANCE] " + str(instance))
+                tag = volume.create_tags(Tags=copythetags(instance))
+    else:
+        print("[INFO] Skipping Instance " + str(instance) + " ... no tags.")

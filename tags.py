@@ -1,6 +1,6 @@
 import boto3
 import logging
-from variables import RoleArn
+#from variables import RoleArn
 from time import strftime
 
 logger = logging.getLogger()
@@ -17,23 +17,23 @@ logger.addHandler(ch)
 
 sts_client = boto3.client('sts')
 
-assumedRoleObject = sts_client.assume_role(
-    RoleArn=RoleArn,
-    RoleSessionName="AssumeRoleSession1"
-)
+#assumedRoleObject = sts_client.assume_role(
+  #  RoleArn=RoleArn,
+   # RoleSessionName="AssumeRoleSession1"
+#)
 
 # From the response that contains the assumed role, get the temporary
 # credentials that can be used to make subsequent API calls
-credentials = assumedRoleObject['Credentials']
+#credentials = assumedRoleObject['Credentials']
 
 # Use the temporary credentials that AssumeRole returns to make a
 # connection to Amazon S3
 ec2 = boto3.resource(
-    'ec2',
-    aws_access_key_id=credentials['AccessKeyId'],
-    aws_secret_access_key=credentials['SecretAccessKey'],
-    aws_session_token=credentials['SessionToken'],
-)
+    'ec2')
+  #  aws_access_key_id=credentials['AccessKeyId'],
+  #  aws_secret_access_key=credentials['SecretAccessKey'],
+  #  aws_session_token=credentials['SessionToken'],
+#)
 
 dryRun = False
 

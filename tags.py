@@ -28,8 +28,7 @@ sts_client = boto3.client('sts')
 
 # Use the temporary credentials that AssumeRole returns to make a
 # connection to Amazon S3
-ec2 = boto3.resource(
-    'ec2')
+ec2 = boto3.resource('ec2')
   #  aws_access_key_id=credentials['AccessKeyId'],
   #  aws_secret_access_key=credentials['SecretAccessKey'],
   #  aws_session_token=credentials['SessionToken'],
